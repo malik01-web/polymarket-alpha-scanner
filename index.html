@@ -983,10 +983,9 @@
     if (user) document.getElementById('identity-btn').textContent = 'Account';
   });
   netlifyIdentity.on('login', user => {
-    netlifyIdentity.close();
-    const roles = user?.app_metadata?.roles || [];
-    window.location.href = roles.includes('pro') ? '/dashboard.html' : '/pricing.html';
-  });
+  netlifyIdentity.close();
+  // Stay on homepage after login - don't redirect
+});
   netlifyIdentity.on('logout', () => {
     document.getElementById('identity-btn').textContent = 'Login';
   });
