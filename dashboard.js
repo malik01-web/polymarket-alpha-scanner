@@ -1,34 +1,37 @@
-
 async function loadMarkets(){
 
-const res = await fetch("/.netlify/functions/markets");
-const markets = await res.json();
+const res = await fetch("/.netlify/functions/markets")
+const markets = await res.json()
 
-const table = document.querySelector("#markets tbody");
-table.innerHTML="";
+const table = document.getElementById("markets")
+table.innerHTML=""
 
-markets.slice(0,50).forEach(m=>{
+markets.slice(0,80).forEach(m=>{
 
-let signal="Neutral";
+let signal="neutral"
 
-if(m.volume>100000){
-signal="Whale Activity";
+if(m.volume > 300000){
+signal="whale"
 }
 
-const row=document.createElement("tr");
+if(m.volume > 600000){
+signal="alpha"
+}
 
-row.innerHTML=`
+const row=`
+<tr>
 <td>${m.question}</td>
-<td>${(m.lastTradePrice*100).toFixed(1)}%</td>
-<td>$${Math.round(m.volume)}</td>
-<td>${signal}</td>
-`;
+<td>${(m.probability*100).toFixed(1)}%</td>
+<td>$${m.volume}</td>
+<td class="${signal}">${signal}</td>
+</tr>
+`
 
-table.appendChild(row);
+table.innerHTML+=row
 
-});
+})
 
 }
 
-loadMarkets();
-setInterval(loadMarkets,30000);
+loadMarkets()
+setInterval(loadMarkets,20000)
