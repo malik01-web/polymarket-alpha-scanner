@@ -1,0 +1,28 @@
+[build]
+  publish = "."
+  functions = "netlify/functions"
+
+# Install stripe in functions
+[functions]
+  node_bundler = "esbuild"
+
+# Environment variables needed (set in Netlify dashboard):
+# STRIPE_SECRET_KEY       = sk_live_...
+# STRIPE_PRICE_ID         = price_...
+# STRIPE_WEBHOOK_SECRET   = whsec_...
+# NETLIFY_IDENTITY_TOKEN  = (from Netlify Identity admin)
+
+# Stripe webhook route
+[[redirects]]
+  from  = "/webhook/stripe"
+  to    = "/.netlify/functions/stripe-webhook"
+  status = 200
+
+# Protect dashboard from non-logged-in users (optional hard redirect)
+# Uncomment to enforce login-wall at Netlify CDN level:
+# [[redirects]]
+#   from = "/dashboard.html"
+#   to   = "/index.html"
+#   status = 302
+#   conditions = { Role = ["pro"] }
+#   force = false
