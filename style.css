@@ -1,8 +1,27 @@
-
 body{
+margin:0;
+font-family:Arial;
 background:#0f172a;
 color:white;
-font-family:Arial, sans-serif;
+}
+
+.sidebar{
+width:220px;
+height:100vh;
+background:#020617;
+position:fixed;
+padding:20px;
+}
+
+.sidebar li{
+list-style:none;
+padding:12px;
+cursor:pointer;
+border-bottom:1px solid #1e293b;
+}
+
+.main{
+margin-left:240px;
 padding:20px;
 }
 
@@ -11,14 +30,11 @@ width:100%;
 border-collapse:collapse;
 }
 
-th,td{
+td,th{
 padding:10px;
-border-bottom:1px solid #2d3748;
+border-bottom:1px solid #334155;
 }
 
-.alert{
-background:#ef4444;
-padding:10px;
-margin-bottom:10px;
-border-radius:5px;
-}
+.alpha{color:#22c55e;}
+.whale{color:#38bdf8;}
+.neutral{color:#facc15;}
