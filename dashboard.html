@@ -1,74 +1,1089 @@
 <!DOCTYPE html>
-<html>
-
+<html lang="en">
 <head>
-<title>Alpha Terminal Dashboard</title>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dashboard — Polymarket Alpha Terminal PRO</title>
+  <link rel="stylesheet" href="style.css"/>
+  <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    /* ── LAYOUT ── */
+    .app {
+      display: grid;
+      grid-template-columns: 220px 1fr;
+      grid-template-rows: 56px 1fr;
+      min-height: 100vh;
+    }
 
-<link rel="stylesheet" href="style.css">
+    /* ── SIDEBAR ── */
+    .sidebar {
+      grid-row: 2;
+      background: var(--bg2);
+      border-right: 1px solid var(--border);
+      padding: 20px 0;
+      position: sticky;
+      top: 56px;
+      height: calc(100vh - 56px);
+      overflow-y: auto;
+      z-index: 50;
+    }
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    .sidebar-section {
+      padding: 0 12px;
+      margin-bottom: 24px;
+    }
 
+    .sidebar-label {
+      font-family: var(--mono);
+      font-size: 9px;
+      letter-spacing: 0.2em;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      padding: 0 8px;
+      margin-bottom: 6px;
+    }
+
+    .sidebar-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 10px;
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--text-mid);
+      cursor: pointer;
+      text-decoration: none;
+      letter-spacing: 0.04em;
+      transition: all 0.15s;
+      border-left: 2px solid transparent;
+      margin-bottom: 2px;
+    }
+
+    .sidebar-item:hover {
+      color: var(--text);
+      background: var(--bg3);
+    }
+
+    .sidebar-item.active {
+      color: var(--blue);
+      background: rgba(41,121,255,0.06);
+      border-left-color: var(--blue);
+    }
+
+    .sidebar-item .icon { font-size: 14px; width: 18px; }
+
+    .sidebar-count {
+      margin-left: auto;
+      font-family: var(--mono);
+      font-size: 10px;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      color: var(--text-dim);
+      padding: 1px 6px;
+    }
+
+    .sidebar-item.active .sidebar-count {
+      background: rgba(41,121,255,0.1);
+      border-color: var(--border2);
+      color: var(--blue);
+    }
+
+    .pro-badge {
+      margin-left: auto;
+      font-family: var(--mono);
+      font-size: 9px;
+      background: rgba(41,121,255,0.15);
+      border: 1px solid var(--border2);
+      color: var(--blue);
+      padding: 1px 5px;
+      letter-spacing: 0.1em;
+    }
+
+    /* ── MAIN ── */
+    .main {
+      grid-column: 2;
+      grid-row: 2;
+      padding: 24px;
+      overflow-y: auto;
+      background: var(--bg);
+    }
+
+    /* ── TOP BAR ── */
+    .topbar {
+      grid-column: 1 / -1;
+      background: rgba(7,12,24,0.95);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 20px 0 0;
+      backdrop-filter: blur(12px);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .topbar-logo {
+      display: flex;
+      align-items: center;
+      height: 56px;
+      padding: 0 20px;
+      border-right: 1px solid var(--border);
+      width: 220px;
+      gap: 8px;
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--text);
+      text-decoration: none;
+    }
+
+    .topbar-logo .dot { color: var(--blue); font-size: 18px; }
+
+    .topbar-center {
+      flex: 1;
+      padding: 0 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .search-box {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      padding: 7px 14px;
+      flex: 1;
+      max-width: 380px;
+    }
+
+    .search-box input {
+      background: none;
+      border: none;
+      outline: none;
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--text);
+      width: 100%;
+    }
+
+    .search-box input::placeholder { color: var(--text-dim); }
+    .search-icon { color: var(--text-dim); font-size: 12px; }
+
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .plan-chip {
+      font-family: var(--mono);
+      font-size: 10px;
+      padding: 4px 10px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .plan-chip.free {
+      border: 1px solid var(--border);
+      color: var(--text-dim);
+    }
+
+    .plan-chip.pro {
+      border: 1px solid var(--blue);
+      color: var(--blue);
+      background: rgba(41,121,255,0.08);
+    }
+
+    /* ── DASHBOARD HEADER ── */
+    .dash-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .dash-title {
+      font-family: var(--sans);
+      font-size: 20px;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: 0.03em;
+    }
+
+    .dash-subtitle {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--text-dim);
+      margin-top: 2px;
+    }
+
+    .dash-controls {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* ── KPI CARDS ── */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .kpi-card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      padding: 16px 18px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .kpi-card::after {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: var(--kpi-color, var(--blue));
+    }
+
+    .kpi-label {
+      font-family: var(--mono);
+      font-size: 9px;
+      color: var(--text-dim);
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+
+    .kpi-value {
+      font-family: var(--mono);
+      font-size: 26px;
+      color: #fff;
+      line-height: 1;
+      margin-bottom: 6px;
+    }
+
+    .kpi-sub {
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--text-dim);
+    }
+
+    .kpi-sub .up   { color: var(--green); }
+    .kpi-sub .down { color: var(--red); }
+
+    /* ── FILTER BAR ── */
+    .filter-bar {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .filter-btn {
+      font-family: var(--mono);
+      font-size: 11px;
+      padding: 6px 14px;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      color: var(--text-dim);
+      cursor: pointer;
+      letter-spacing: 0.08em;
+      transition: all 0.15s;
+      text-transform: uppercase;
+    }
+
+    .filter-btn:hover { border-color: var(--border2); color: var(--text); }
+
+    .filter-btn.active {
+      background: rgba(41,121,255,0.1);
+      border-color: var(--blue);
+      color: var(--blue);
+    }
+
+    .filter-divider {
+      width: 1px;
+      height: 20px;
+      background: var(--border);
+      margin: 0 4px;
+    }
+
+    .sort-select {
+      font-family: var(--mono);
+      font-size: 11px;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      color: var(--text-dim);
+      padding: 6px 10px;
+      cursor: pointer;
+      outline: none;
+      margin-left: auto;
+    }
+
+    /* ── MARKETS TABLE ── */
+    .markets-panel {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      margin-bottom: 24px;
+    }
+
+    .panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg3);
+    }
+
+    .panel-title {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--text-dim);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .panel-title .count {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      padding: 1px 6px;
+      font-size: 10px;
+      color: var(--text-dim);
+    }
+
+    .table-header {
+      display: grid;
+      grid-template-columns: 2fr 90px 90px 90px 100px;
+      gap: 8px;
+      padding: 9px 16px;
+      background: var(--bg3);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .th {
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--text-dim);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      cursor: pointer;
+      user-select: none;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .th:not(:first-child) { justify-content: flex-end; }
+    .th:hover { color: var(--text); }
+    .th.sorted { color: var(--blue); }
+
+    .market-row {
+      display: grid;
+      grid-template-columns: 2fr 90px 90px 90px 100px;
+      gap: 8px;
+      padding: 12px 16px;
+      border-bottom: 1px solid rgba(26,42,66,0.4);
+      transition: background 0.15s;
+      cursor: pointer;
+    }
+
+    .market-row:hover { background: var(--bg3); }
+    .market-row:last-child { border-bottom: none; }
+
+    .market-info {}
+
+    .market-title {
+      font-family: var(--body);
+      font-size: 13px;
+      color: var(--text);
+      font-weight: 400;
+      margin-bottom: 4px;
+      line-height: 1.3;
+    }
+
+    .market-meta {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .cat-tag {
+      font-family: var(--mono);
+      font-size: 9px;
+      color: var(--text-dim);
+      background: var(--bg);
+      border: 1px solid var(--border);
+      padding: 1px 6px;
+      letter-spacing: 0.08em;
+    }
+
+    .volume-tag {
+      font-family: var(--mono);
+      font-size: 9px;
+      color: var(--text-dim);
+    }
+
+    .cell {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      font-family: var(--mono);
+      font-size: 13px;
+    }
+
+    .cell-market  { color: var(--text-mid); }
+    .cell-ai      { color: var(--blue); }
+    .cell-vol     { color: var(--text-dim); font-size: 11px; }
+
+    .edge-pill {
+      font-family: var(--mono);
+      font-size: 12px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border: 1px solid;
+      display: inline-block;
+    }
+
+    .edge-high { color: var(--green); border-color: rgba(0,230,118,0.3); background: rgba(0,230,118,0.06); }
+    .edge-mid  { color: var(--gold);  border-color: rgba(255,215,64,0.3);  background: rgba(255,215,64,0.06); }
+    .edge-low  { color: var(--text-dim); border-color: var(--border); background: transparent; }
+    .edge-neg  { color: var(--red);   border-color: rgba(255,23,68,0.3);  background: rgba(255,23,68,0.06); }
+
+    /* ── PRO GATE ── */
+    .pro-gate {
+      position: relative;
+    }
+
+    .pro-gate-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to bottom, rgba(7,12,24,0) 0%, rgba(7,12,24,0.95) 40%, var(--bg) 100%);
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      padding-bottom: 32px;
+      z-index: 10;
+    }
+
+    .pro-gate-box {
+      background: var(--bg2);
+      border: 1px solid var(--border2);
+      padding: 24px 32px;
+      text-align: center;
+      max-width: 380px;
+      width: 100%;
+    }
+
+    .pro-gate-box .lock { font-size: 24px; margin-bottom: 10px; }
+
+    .pro-gate-box h3 {
+      font-family: var(--sans);
+      font-size: 18px;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 6px;
+    }
+
+    .pro-gate-box p {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--text-dim);
+      margin-bottom: 16px;
+      line-height: 1.7;
+    }
+
+    .blurred { filter: blur(4px); user-select: none; pointer-events: none; }
+
+    /* ── CHART PANEL ── */
+    .bottom-grid {
+      display: grid;
+      grid-template-columns: 1fr 320px;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .chart-panel {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+    }
+
+    .chart-body {
+      padding: 16px;
+      height: 240px;
+    }
+
+    /* ── ALERTS PANEL ── */
+    .alerts-panel {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+    }
+
+    .alert-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 12px 16px;
+      border-bottom: 1px solid rgba(26,42,66,0.4);
+    }
+
+    .alert-item:last-child { border-bottom: none; }
+
+    .alert-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      margin-top: 5px;
+      flex-shrink: 0;
+    }
+
+    .alert-text {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--text-mid);
+      line-height: 1.6;
+    }
+
+    .alert-time {
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--text-dim);
+      margin-top: 2px;
+    }
+
+    /* ── UPGRADE BANNER ── */
+    .upgrade-banner {
+      background: linear-gradient(135deg, var(--bg3), rgba(41,121,255,0.06));
+      border: 1px solid var(--border2);
+      padding: 20px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 24px;
+    }
+
+    .upgrade-banner .ub-text {
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--text-mid);
+    }
+
+    .upgrade-banner .ub-text strong {
+      color: var(--blue);
+      font-weight: 400;
+    }
+
+    /* ── BTN ── */
+    .btn {
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 9px 18px;
+      border: 1px solid;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-decoration: none;
+      display: inline-block;
+    }
+
+    .btn-blue {
+      background: var(--blue);
+      border-color: var(--blue);
+      color: #fff;
+    }
+
+    .btn-blue:hover { background: var(--blue2); }
+
+    .btn-outline {
+      background: transparent;
+      border-color: var(--border2);
+      color: var(--text-mid);
+    }
+
+    .btn-outline:hover { border-color: var(--text-mid); color: var(--text); }
+
+    /* Mobile adjustments */
+    @media (max-width: 768px) {
+      .app { grid-template-columns: 1fr; }
+      .sidebar { display: none; }
+      .topbar { grid-column: 1; }
+      .main { grid-column: 1; }
+      .bottom-grid { grid-template-columns: 1fr; }
+      .table-header,
+      .market-row { grid-template-columns: 1fr 70px 70px; }
+      .market-row .cell-vol,
+      .th:nth-child(3) { display: none; }
+    }
+  </style>
 </head>
-
 <body>
+<div class="page-grid"></div>
 
-<h1>Market Scanner</h1>
+<div class="app">
 
-<div class="controls">
+  <!-- TOP BAR -->
+  <div class="topbar">
+    <a href="index.html" class="topbar-logo">
+      <span class="dot">◈</span> ALPHA_TERMINAL
+    </a>
+    <div class="topbar-center">
+      <div class="search-box">
+        <span class="search-icon">⌕</span>
+        <input type="text" id="search-input" placeholder="Search markets..." oninput="filterMarkets()"/>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <div class="plan-chip free" id="plan-chip">FREE</div>
+      <button class="btn btn-outline" style="padding:6px 12px;font-size:10px;" id="identity-btn">Login</button>
+      <a href="pricing.html" class="btn btn-blue" style="padding:6px 14px;font-size:10px;">Upgrade Pro</a>
+    </div>
+  </div>
 
-<input id="search" placeholder="Search markets">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-label">Main</div>
+      <a href="#" class="sidebar-item active" onclick="filterCat('all', this)">
+        <span class="icon">⊞</span> All Markets
+        <span class="sidebar-count" id="sc-all">—</span>
+      </a>
+      <a href="#" class="sidebar-item" onclick="filterCat('top', this)">
+        <span class="icon">⭐</span> Top Edges
+        <span class="sidebar-count" id="sc-top">—</span>
+      </a>
+    </div>
 
-<select id="category">
-<option value="all">All</option>
-<option value="crypto">Crypto</option>
-<option value="politics">Politics</option>
-<option value="sports">Sports</option>
-</select>
+    <div class="sidebar-section">
+      <div class="sidebar-label">Categories</div>
+      <a href="#" class="sidebar-item" onclick="filterCat('POLITICS', this)">
+        <span class="icon">🗳️</span> Politics
+        <span class="sidebar-count">48</span>
+      </a>
+      <a href="#" class="sidebar-item" onclick="filterCat('CRYPTO', this)">
+        <span class="icon">₿</span> Crypto
+        <span class="sidebar-count">62</span>
+      </a>
+      <a href="#" class="sidebar-item" onclick="filterCat('SPORTS', this)">
+        <span class="icon">🏆</span> Sports
+        <span class="sidebar-count">37</span>
+      </a>
+      <a href="#" class="sidebar-item" onclick="filterCat('WORLD', this)">
+        <span class="icon">🌍</span> World
+        <span class="sidebar-count">29</span>
+      </a>
+      <a href="#" class="sidebar-item" onclick="filterCat('SCIENCE', this)">
+        <span class="icon">🔬</span> Science
+        <span class="sidebar-count">19</span>
+      </a>
+      <a href="#" class="sidebar-item" onclick="filterCat('FINANCE', this)">
+        <span class="icon">📈</span> Finance
+        <span class="sidebar-count">24</span>
+      </a>
+      <a href="#" class="sidebar-item" onclick="filterCat('AI', this)">
+        <span class="icon">🤖</span> AI & Tech
+        <span class="sidebar-count">21</span>
+      </a>
+    </div>
 
+    <div class="sidebar-section">
+      <div class="sidebar-label">Pro Tools</div>
+      <a href="pricing.html" class="sidebar-item">
+        <span class="icon">🐋</span> Whale Tracker
+        <span class="pro-badge">PRO</span>
+      </a>
+      <a href="pricing.html" class="sidebar-item">
+        <span class="icon">🔔</span> Alerts
+        <span class="pro-badge">PRO</span>
+      </a>
+      <a href="pricing.html" class="sidebar-item">
+        <span class="icon">📊</span> Analytics
+        <span class="pro-badge">PRO</span>
+      </a>
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main class="main">
+
+    <!-- Header -->
+    <div class="dash-header">
+      <div>
+        <div class="dash-title">Market Scanner</div>
+        <div class="dash-subtitle" id="dash-sub">Loading markets...</div>
+      </div>
+      <div class="dash-controls">
+        <div class="live-badge" style="display:inline-flex;align-items:center;gap:6px;border:1px solid rgba(0,230,118,0.3);background:rgba(0,230,118,0.06);padding:5px 10px;font-family:var(--mono);font-size:10px;color:var(--green);letter-spacing:.1em;">
+          <span style="width:5px;height:5px;background:var(--green);border-radius:50%;display:inline-block;animation:pulse 2s infinite"></span> LIVE
+        </div>
+      </div>
+    </div>
+
+    <!-- KPI Row -->
+    <div class="kpi-grid">
+      <div class="kpi-card" style="--kpi-color:var(--blue)">
+        <div class="kpi-label">Total Markets</div>
+        <div class="kpi-value" id="k-total">—</div>
+        <div class="kpi-sub">active now</div>
+      </div>
+      <div class="kpi-card" style="--kpi-color:var(--green)">
+        <div class="kpi-label">High Edge</div>
+        <div class="kpi-value" id="k-high">—</div>
+        <div class="kpi-sub"><span class="up">▲</span> &gt;10% edge</div>
+      </div>
+      <div class="kpi-card" style="--kpi-color:var(--gold)">
+        <div class="kpi-label">Avg AI Edge</div>
+        <div class="kpi-value" id="k-avg">—</div>
+        <div class="kpi-sub">across all signals</div>
+      </div>
+      <div class="kpi-card" style="--kpi-color:var(--purple)">
+        <div class="kpi-label">Top Edge</div>
+        <div class="kpi-value" id="k-top">—</div>
+        <div class="kpi-sub">best opportunity</div>
+      </div>
+    </div>
+
+    <!-- Upgrade Banner (shown for free users) -->
+    <div class="upgrade-banner" id="upgrade-banner">
+      <div class="ub-text">🔒 You're on the <strong>Free Plan</strong> — AI signals, whale activity &amp; full edge scores are hidden. <strong>Upgrade to Pro</strong> to unlock everything.</div>
+      <a href="pricing.html" class="btn btn-blue">Upgrade $29/mo →</a>
+    </div>
+
+    <!-- Filter Bar -->
+    <div class="filter-bar">
+      <button class="filter-btn active" onclick="setEdge('all', this)">All</button>
+      <button class="filter-btn" onclick="setEdge('high', this)">High Edge (&gt;10%)</button>
+      <button class="filter-btn" onclick="setEdge('mid', this)">Mid Edge (5–10%)</button>
+      <div class="filter-divider"></div>
+      <select class="sort-select" onchange="sortMarkets(this.value)">
+        <option value="edge">Sort: Highest Edge</option>
+        <option value="prob">Sort: Market Prob</option>
+        <option value="ai">Sort: AI Prob</option>
+      </select>
+    </div>
+
+    <!-- Markets Table -->
+    <div class="markets-panel">
+      <div class="panel-header">
+        <div class="panel-title">
+          ALPHA SIGNALS
+          <span class="count" id="market-count">—</span>
+        </div>
+      </div>
+
+      <div class="table-header">
+        <div class="th">Market</div>
+        <div class="th sorted" onclick="sortMarkets('prob')">Market% ↕</div>
+        <div class="th" onclick="sortMarkets('ai')">AI Prob ↕</div>
+        <div class="th cell-vol">Volume</div>
+        <div class="th" onclick="sortMarkets('edge')">Edge ↕</div>
+      </div>
+
+      <div id="markets-body">
+        <!-- Populated by JS -->
+      </div>
+    </div>
+
+    <!-- Bottom Grid: Chart + Alerts -->
+    <div class="bottom-grid">
+      <div class="chart-panel">
+        <div class="panel-header">
+          <div class="panel-title">Probability Chart — Top Market</div>
+        </div>
+        <div class="chart-body">
+          <canvas id="prob-chart"></canvas>
+        </div>
+      </div>
+
+      <div class="alerts-panel">
+        <div class="panel-header">
+          <div class="panel-title">Recent Signals</div>
+        </div>
+        <div class="alert-item">
+          <div class="alert-dot" style="background:var(--green)"></div>
+          <div>
+            <div class="alert-text">BTC $100k — edge jumped from 14% → 23%</div>
+            <div class="alert-time">2 min ago</div>
+          </div>
+        </div>
+        <div class="alert-item">
+          <div class="alert-dot" style="background:var(--blue)"></div>
+          <div>
+            <div class="alert-text">Crypto regulation — new AI signal: +18%</div>
+            <div class="alert-time">8 min ago</div>
+          </div>
+        </div>
+        <div class="alert-item">
+          <div class="alert-dot" style="background:var(--gold)"></div>
+          <div>
+            <div class="alert-text blurred">█████████ — whale moved $45k</div>
+            <div class="alert-time">PRO ONLY</div>
+          </div>
+        </div>
+        <div class="alert-item">
+          <div class="alert-dot" style="background:var(--purple)"></div>
+          <div>
+            <div class="alert-text blurred">█████ — edge reversed -8%</div>
+            <div class="alert-time">PRO ONLY</div>
+          </div>
+        </div>
+        <div style="padding:12px 16px;border-top:1px solid var(--border)">
+          <a href="pricing.html" class="btn btn-outline" style="font-size:10px;padding:6px 14px;display:block;text-align:center;">🔔 Enable All Alerts →</a>
+        </div>
+      </div>
+    </div>
+
+  </main>
 </div>
 
+<script>
+// ─── DATA ───────────────────────────────────────────────
+const MARKETS_DATA = [
+  { id:1,  title:"Will BTC hit $100k before July 2026?",              cat:"CRYPTO",   mProb:44, aiProb:67, vol:"$2.1M" },
+  { id:2,  title:"Will US pass crypto regulation in 2026?",           cat:"POLITICS", mProb:31, aiProb:49, vol:"$1.4M" },
+  { id:3,  title:"Will Lakers win the 2026 NBA Finals?",              cat:"SPORTS",   mProb:18, aiProb:29, vol:"$980K" },
+  { id:4,  title:"Will GPT-5 launch before July 2026?",               cat:"AI",       mProb:52, aiProb:61, vol:"$750K" },
+  { id:5,  title:"Will ETH flip BTC market cap by EOY?",              cat:"CRYPTO",   mProb:8,  aiProb:14, vol:"$620K" },
+  { id:6,  title:"Will Trump sign executive order on AI by Q3?",      cat:"POLITICS", mProb:38, aiProb:53, vol:"$510K" },
+  { id:7,  title:"Will SpaceX Starship reach orbit in 2026?",         cat:"SCIENCE",  mProb:71, aiProb:82, vol:"$440K" },
+  { id:8,  title:"Will there be a US recession in 2026?",             cat:"FINANCE",  mProb:29, aiProb:41, vol:"$390K" },
+  { id:9,  title:"Will Federer come out of retirement?",              cat:"SPORTS",   mProb:4,  aiProb:7,  vol:"$120K" },
+  { id:10, title:"Will Apple release AR glasses in 2026?",            cat:"AI",       mProb:33, aiProb:44, vol:"$310K" },
+  // Blurred/locked for free
+  { id:11, title:"████████████████████████████████",                  cat:"WORLD",    mProb:76, aiProb:91, vol:"$280K", locked:true },
+  { id:12, title:"████████████████████████████",                       cat:"FINANCE",  mProb:22, aiProb:38, vol:"$260K", locked:true },
+  { id:13, title:"████████████████████████████████████",              cat:"POLITICS", mProb:55, aiProb:69, vol:"$240K", locked:true },
+  { id:14, title:"████████████████████████████",                       cat:"CRYPTO",   mProb:12, aiProb:27, vol:"$210K", locked:true },
+  { id:15, title:"████████████████████████████████████████",          cat:"AI",       mProb:63, aiProb:74, vol:"$190K", locked:true },
+];
 
-<div class="panel">
+let currentCat = 'all';
+let currentEdge = 'all';
+let currentSort = 'edge';
+let currentSearch = '';
 
-<h3>Top Alpha Signals</h3>
+function getEdge(m) { return m.aiProb - m.mProb; }
 
-<div id="signals"></div>
+function edgeClass(e) {
+  if (e >= 10) return 'edge-high';
+  if (e >= 5)  return 'edge-mid';
+  if (e >= 0)  return 'edge-low';
+  return 'edge-neg';
+}
 
-</div>
+function getFiltered() {
+  let data = [...MARKETS_DATA];
+  if (currentCat === 'top') data = data.sort((a,b) => getEdge(b)-getEdge(a)).slice(0,5);
+  else if (currentCat !== 'all') data = data.filter(m => m.cat === currentCat);
 
+  if (currentSearch) {
+    const q = currentSearch.toLowerCase();
+    data = data.filter(m => m.title.toLowerCase().includes(q));
+  }
 
-<div class="panel">
+  if (currentEdge === 'high') data = data.filter(m => getEdge(m) >= 10);
+  if (currentEdge === 'mid')  data = data.filter(m => getEdge(m) >= 5 && getEdge(m) < 10);
 
-<h3>Markets</h3>
+  data.sort((a,b) => {
+    if (currentSort === 'edge') return getEdge(b)-getEdge(a);
+    if (currentSort === 'prob') return b.mProb-a.mProb;
+    if (currentSort === 'ai')   return b.aiProb-a.aiProb;
+    return 0;
+  });
 
-<table>
+  return data;
+}
 
-<thead>
-<tr>
-<th>Market</th>
-<th>Market Prob</th>
-<th>AI Prob</th>
-<th>Edge</th>
-<th>Rank</th>
-</tr>
-</thead>
+function renderMarkets() {
+  const data = getFiltered();
+  const body = document.getElementById('markets-body');
+  document.getElementById('market-count').textContent = data.length;
+  document.getElementById('dash-sub').textContent = `${data.length} markets · sorted by edge`;
 
-<tbody id="markets"></tbody>
+  if (!data.length) {
+    body.innerHTML = '<div style="padding:32px;text-align:center;font-family:var(--mono);font-size:12px;color:var(--text-dim)">No markets match your filter.</div>';
+    return;
+  }
 
-</table>
+  body.innerHTML = data.map(m => {
+    const edge = getEdge(m);
+    const cls  = edgeClass(edge);
+    const locked = m.locked;
+    const edgeSign = edge > 0 ? '+' : '';
 
-</div>
+    return `
+    <div class="market-row" onclick="${locked ? "window.location.href='pricing.html'" : ''}">
+      <div class="market-info">
+        <div class="market-title ${locked ? 'blurred' : ''}">${m.title}</div>
+        <div class="market-meta">
+          <span class="cat-tag">${m.cat}</span>
+          <span class="volume-tag">${m.vol}</span>
+          ${locked ? '<span class="cat-tag" style="color:var(--blue);border-color:var(--border2)">🔒 PRO</span>' : ''}
+        </div>
+      </div>
+      <div class="cell cell-market ${locked ? 'blurred' : ''}">${m.mProb}%</div>
+      <div class="cell cell-ai ${locked ? 'blurred' : ''}">${m.aiProb}%</div>
+      <div class="cell cell-vol ${locked ? 'blurred' : ''}">${m.vol}</div>
+      <div class="cell">
+        <span class="edge-pill ${cls} ${locked ? 'blurred' : ''}">${edgeSign}${edge}%</span>
+      </div>
+    </div>`;
+  }).join('');
+}
 
+function updateKPIs() {
+  const data = MARKETS_DATA;
+  const edges = data.map(getEdge);
+  document.getElementById('k-total').textContent = data.length;
+  document.getElementById('k-high').textContent  = data.filter(m => getEdge(m) >= 10).length;
+  document.getElementById('k-avg').textContent   = Math.round(edges.reduce((a,b)=>a+b,0)/edges.length) + '%';
+  document.getElementById('k-top').textContent   = '+' + Math.max(...edges) + '%';
+  document.getElementById('sc-all').textContent  = data.length;
+  document.getElementById('sc-top').textContent  = data.filter(m => getEdge(m) >= 10).length;
+}
 
-<div class="panel">
+function filterCat(cat, el) {
+  currentCat = cat;
+  document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
+  el.classList.add('active');
+  renderMarkets();
+}
 
-<h3>Probability Chart</h3>
+function setEdge(edge, el) {
+  currentEdge = edge;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  renderMarkets();
+}
 
-<canvas id="probChart"></canvas>
+function sortMarkets(by) {
+  currentSort = by;
+  renderMarkets();
+}
 
-</div>
+function filterMarkets() {
+  currentSearch = document.getElementById('search-input').value;
+  renderMarkets();
+}
 
-<script type="module" src="dashboard.js"></script>
+// ─── CHART ──────────────────────────────────────────────
+function renderChart() {
+  const ctx = document.getElementById('prob-chart').getContext('2d');
+  const labels = ['Mar 1','Mar 3','Mar 5','Mar 7','Mar 9','Mar 11','Mar 13','Mar 15'];
+  new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [
+        {
+          label: 'Market Prob',
+          data: [38,40,41,43,42,44,44,44],
+          borderColor: '#4a6080',
+          backgroundColor: 'rgba(74,96,128,0.05)',
+          borderWidth: 1.5,
+          pointRadius: 3,
+          tension: 0.4,
+        },
+        {
+          label: 'AI Prob',
+          data: [55,57,59,60,63,65,66,67],
+          borderColor: '#2979ff',
+          backgroundColor: 'rgba(41,121,255,0.08)',
+          borderWidth: 2,
+          pointRadius: 3,
+          tension: 0.4,
+          fill: true,
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          labels: {
+            font: { family: 'Share Tech Mono', size: 10 },
+            color: '#4a6080',
+            boxWidth: 12,
+          }
+        },
+        tooltip: {
+          backgroundColor: '#0b1220',
+          borderColor: '#1a2a42',
+          borderWidth: 1,
+          titleFont: { family: 'Share Tech Mono', size: 11 },
+          bodyFont:  { family: 'Share Tech Mono', size: 11 },
+          titleColor: '#c0d4f0',
+          bodyColor:  '#7a9abf',
+        }
+      },
+      scales: {
+        x: {
+          grid: { color: 'rgba(26,42,66,0.4)' },
+          ticks: { font: { family: 'Share Tech Mono', size: 10 }, color: '#3d5470' }
+        },
+        y: {
+          grid: { color: 'rgba(26,42,66,0.4)' },
+          ticks: {
+            font: { family: 'Share Tech Mono', size: 10 },
+            color: '#3d5470',
+            callback: v => v + '%'
+          }
+        }
+      }
+    }
+  });
+}
 
+// ─── AUTH ────────────────────────────────────────────────
+netlifyIdentity.on('init', user => {
+  if (user) {
+    document.getElementById('identity-btn').textContent = 'Account';
+    const roles = user.app_metadata?.roles || [];
+    if (roles.includes('pro')) {
+      document.getElementById('plan-chip').textContent = 'PRO';
+      document.getElementById('plan-chip').className = 'plan-chip pro';
+      document.getElementById('upgrade-banner').style.display = 'none';
+    }
+  }
+});
+
+netlifyIdentity.on('login', user => {
+  netlifyIdentity.close();
+  const roles = user.app_metadata?.roles || [];
+  if (roles.includes('pro')) {
+    document.getElementById('plan-chip').textContent = 'PRO';
+    document.getElementById('plan-chip').className = 'plan-chip pro';
+    document.getElementById('upgrade-banner').style.display = 'none';
+  }
+  document.getElementById('identity-btn').textContent = 'Account';
+});
+
+netlifyIdentity.on('logout', () => {
+  document.getElementById('identity-btn').textContent = 'Login';
+  document.getElementById('plan-chip').textContent = 'FREE';
+  document.getElementById('plan-chip').className = 'plan-chip free';
+  document.getElementById('upgrade-banner').style.display = 'flex';
+});
+
+document.getElementById('identity-btn').addEventListener('click', () => netlifyIdentity.open());
+
+// ─── INIT ────────────────────────────────────────────────
+updateKPIs();
+renderMarkets();
+renderChart();
+</script>
 </body>
 </html>
