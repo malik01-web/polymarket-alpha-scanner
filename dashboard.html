@@ -920,7 +920,8 @@ function renderMarkets() {
   body.innerHTML = data.map(m => {
     const edge = getEdge(m);
     const cls  = edgeClass(edge);
-    const locked = m.locked;
+    const isPro = (netlifyIdentity.currentUser()?.app_metadata?.roles || []).includes('pro');
+const locked = m.locked && !isPro;
     const edgeSign = edge > 0 ? '+' : '';
 
     return `
