@@ -1,3 +1,7 @@
+
+import { predictProbability, calculateEdge } from "./predictionModel.js"
+import { rankMarkets } from "./rankingEngine.js"
+
 async function loadMarkets(){
 
 const res = await fetch("/.netlify/functions/markets")
@@ -6,32 +10,38 @@ const markets = await res.json()
 const table = document.getElementById("markets")
 table.innerHTML=""
 
-markets.slice(0,80).forEach(m=>{
+const enriched = markets.map(m=>{
 
-let signal="neutral"
+const ai = predictProbability(m)
+const edge = calculateEdge(m)
 
-if(m.volume > 300000){
-signal="whale"
+return {
+...m,
+aiProb:ai,
+edge:edge
 }
 
-if(m.volume > 600000){
-signal="alpha"
-}
+})
+
+const ranked = rankMarkets(enriched)
+
+ranked.slice(0,40).forEach(m=>{
 
 const row=`
 <tr>
 <td>${m.question}</td>
-<td>${(m.probability*100).toFixed(1)}%</td>
-<td>$${m.volume}</td>
-<td class="${signal}">${signal}</td>
+<td>${(m.lastTradePrice*100).toFixed(1)}%</td>
+<td>${(m.aiProb*100).toFixed(1)}%</td>
+<td>${(m.edge*100).toFixed(1)}%</td>
+<td class="alpha">${m.rankScore.toFixed(2)}</td>
 </tr>
 `
 
-table.innerHTML+=row
+table.innerHTML += row
 
 })
 
 }
 
 loadMarkets()
-setInterval(loadMarkets,20000)
+setInterval(loadMarkets,30000)

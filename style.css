@@ -1,28 +1,33 @@
+
 body{
-margin:0;
-font-family:Arial;
 background:#0f172a;
 color:white;
-}
-
-.sidebar{
-width:220px;
-height:100vh;
-background:#020617;
-position:fixed;
+font-family:Arial;
+margin:0;
 padding:20px;
 }
 
-.sidebar li{
-list-style:none;
-padding:12px;
-cursor:pointer;
+.topbar{
+background:#020617;
+padding:20px;
 border-bottom:1px solid #1e293b;
 }
 
-.main{
-margin-left:240px;
-padding:20px;
+.hero{
+text-align:center;
+padding:60px 20px;
+}
+
+.panel{
+background:#020617;
+padding:15px;
+border-radius:8px;
+border:1px solid #1e293b;
+margin-top:20px;
+}
+
+.controls{
+margin-bottom:15px;
 }
 
 table{
@@ -35,6 +40,7 @@ padding:10px;
 border-bottom:1px solid #334155;
 }
 
-.alpha{color:#22c55e;}
-.whale{color:#38bdf8;}
-.neutral{color:#facc15;}
+.alpha{
+color:#22c55e;
+font-weight:bold;
+}
