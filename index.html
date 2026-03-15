@@ -1,21 +1,1014 @@
-
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<title>Alpha Terminal</title>
-<link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Polymarket Alpha Terminal PRO — Find Edges Before The Crowd</title>
+  <link rel="stylesheet" href="style.css"/>
+  <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+  <style>
+    /* ── HERO ── */
+    .hero {
+      position: relative;
+      z-index: 10;
+      padding: 80px 24px 64px;
+      text-align: center;
+      overflow: hidden;
+    }
+
+    .hero-glow {
+      position: absolute;
+      top: -100px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 600px;
+      height: 400px;
+      background: radial-gradient(ellipse, rgba(41,121,255,0.12) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .hero-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: 0.2em;
+      color: var(--green);
+      text-transform: uppercase;
+      margin-bottom: 20px;
+      animation: fadeUp 0.4s ease both;
+    }
+
+    .hero-eyebrow .live-dot {
+      width: 6px;
+      height: 6px;
+      background: var(--green);
+      border-radius: 50%;
+      animation: pulse 2s ease infinite;
+    }
+
+    .hero-title {
+      font-family: var(--sans);
+      font-size: clamp(32px, 7vw, 64px);
+      font-weight: 700;
+      line-height: 1.05;
+      letter-spacing: 0.02em;
+      color: #fff;
+      margin-bottom: 20px;
+      animation: fadeUp 0.4s ease 0.05s both;
+    }
+
+    .hero-title .accent { color: var(--blue); }
+    .hero-title .accent2 { color: var(--green); }
+
+    .hero-sub {
+      font-family: var(--mono);
+      font-size: 13px;
+      color: var(--text-mid);
+      max-width: 520px;
+      margin: 0 auto 36px;
+      line-height: 1.9;
+      animation: fadeUp 0.4s ease 0.1s both;
+    }
+
+    .hero-cta {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap;
+      animation: fadeUp 0.4s ease 0.15s both;
+    }
+
+    .btn-primary, .btn-secondary {
+      font-family: var(--mono);
+      font-size: 12px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      padding: 14px 28px;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s;
+      border: 1px solid;
+    }
+
+    .btn-primary {
+      background: var(--blue);
+      border-color: var(--blue);
+      color: #fff;
+      box-shadow: 0 0 24px rgba(41,121,255,0.3);
+    }
+
+    .btn-primary:hover {
+      background: var(--blue2);
+      box-shadow: 0 0 36px rgba(41,121,255,0.5);
+    }
+
+    .btn-secondary {
+      background: transparent;
+      border-color: var(--border2);
+      color: var(--text-mid);
+    }
+
+    .btn-secondary:hover {
+      border-color: var(--text-mid);
+      color: var(--text);
+    }
+
+    /* ── STATS BAR ── */
+    .stats-bar {
+      position: relative;
+      z-index: 10;
+      display: flex;
+      justify-content: center;
+      gap: 0;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      background: var(--bg2);
+      flex-wrap: wrap;
+      animation: fadeUp 0.4s ease 0.2s both;
+    }
+
+    .stat-item {
+      padding: 20px 32px;
+      text-align: center;
+      border-right: 1px solid var(--border);
+      flex: 1;
+      min-width: 120px;
+    }
+
+    .stat-item:last-child { border-right: none; }
+
+    .stat-num {
+      font-family: var(--mono);
+      font-size: 22px;
+      color: #fff;
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .stat-num span { color: var(--blue); }
+
+    .stat-label {
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--text-dim);
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+    }
+
+    /* ── SECTION HEADER ── */
+    .section {
+      position: relative;
+      z-index: 10;
+      padding: 64px 24px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 40px;
+    }
+
+    .section-label {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.2em;
+      color: var(--text-dim);
+      text-transform: uppercase;
+    }
+
+    .section-title {
+      font-family: var(--sans);
+      font-size: 24px;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: 0.03em;
+    }
+
+    .section-line {
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(90deg, var(--border2), transparent);
+    }
+
+    /* ── CATEGORY GRID ── */
+    .cat-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 12px;
+    }
+
+    .cat-card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      padding: 20px 16px;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-decoration: none;
+      display: block;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .cat-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: var(--cat-color, var(--blue));
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.3s;
+    }
+
+    .cat-card:hover {
+      border-color: var(--cat-color, var(--blue));
+      transform: translateY(-2px);
+    }
+
+    .cat-card:hover::before { transform: scaleX(1); }
+
+    .cat-icon {
+      font-size: 24px;
+      margin-bottom: 10px;
+      display: block;
+    }
+
+    .cat-name {
+      font-family: var(--sans);
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text);
+      letter-spacing: 0.03em;
+      margin-bottom: 4px;
+    }
+
+    .cat-count {
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--text-dim);
+    }
+
+    .cat-badge {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      font-family: var(--mono);
+      font-size: 9px;
+      padding: 2px 6px;
+      background: var(--cat-color, var(--blue));
+      color: #000;
+      letter-spacing: 0.1em;
+      font-weight: 700;
+      opacity: 0.85;
+    }
+
+    /* ── HOW IT WORKS ── */
+    .how-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+    }
+
+    .how-card {
+      background: var(--bg2);
+      padding: 32px 24px;
+      position: relative;
+    }
+
+    .how-num {
+      font-family: var(--mono);
+      font-size: 48px;
+      color: var(--border2);
+      line-height: 1;
+      margin-bottom: 16px;
+      letter-spacing: -0.03em;
+    }
+
+    .how-title {
+      font-family: var(--sans);
+      font-size: 16px;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 8px;
+      letter-spacing: 0.03em;
+    }
+
+    .how-desc {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--text-dim);
+      line-height: 1.8;
+    }
+
+    /* ── LIVE MARKETS PREVIEW ── */
+    .markets-preview {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+    }
+
+    .markets-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .markets-header-left {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--text-dim);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      letter-spacing: 0.1em;
+    }
+
+    .live-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: rgba(0,230,118,0.1);
+      border: 1px solid rgba(0,230,118,0.3);
+      padding: 2px 8px;
+      font-family: var(--mono);
+      font-size: 9px;
+      color: var(--green);
+      letter-spacing: 0.15em;
+    }
+
+    .market-row {
+      display: grid;
+      grid-template-columns: 1fr 80px 80px 80px;
+      gap: 8px;
+      align-items: center;
+      padding: 12px 20px;
+      border-bottom: 1px solid rgba(26,42,66,0.5);
+      transition: background 0.15s;
+    }
+
+    .market-row:hover { background: var(--bg3); }
+    .market-row:last-child { border-bottom: none; }
+
+    .market-row-header {
+      background: var(--bg3);
+    }
+
+    .market-row-header span {
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--text-dim);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .market-name {
+      font-family: var(--body);
+      font-size: 13px;
+      color: var(--text);
+      font-weight: 400;
+    }
+
+    .market-cat {
+      font-family: var(--mono);
+      font-size: 9px;
+      color: var(--text-dim);
+      letter-spacing: 0.08em;
+      margin-top: 2px;
+    }
+
+    .market-prob {
+      font-family: var(--mono);
+      font-size: 13px;
+      color: var(--text-mid);
+      text-align: right;
+    }
+
+    .market-ai {
+      font-family: var(--mono);
+      font-size: 13px;
+      color: var(--blue);
+      text-align: right;
+    }
+
+    .market-edge {
+      font-family: var(--mono);
+      font-size: 13px;
+      font-weight: 700;
+      text-align: right;
+    }
+
+    .edge-high { color: var(--green); }
+    .edge-mid  { color: var(--gold); }
+    .edge-low  { color: var(--text-dim); }
+
+    .blurred { filter: blur(5px); user-select: none; color: var(--text-dim); }
+
+    .unlock-row {
+      padding: 16px 20px;
+      background: linear-gradient(to right, var(--bg3), var(--bg2));
+      border-top: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .unlock-text {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--text-dim);
+    }
+
+    .unlock-text strong { color: var(--blue); font-weight: 400; }
+
+    /* ── FEATURES ── */
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+    }
+
+    .feat-card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      padding: 28px 24px;
+      position: relative;
+      transition: border-color 0.2s, transform 0.2s;
+    }
+
+    .feat-card:hover {
+      border-color: var(--border2);
+      transform: translateY(-2px);
+    }
+
+    .feat-icon {
+      width: 40px;
+      height: 40px;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      margin-bottom: 16px;
+    }
+
+    .feat-title {
+      font-family: var(--sans);
+      font-size: 16px;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 8px;
+      letter-spacing: 0.03em;
+    }
+
+    .feat-desc {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--text-dim);
+      line-height: 1.9;
+    }
+
+    .feat-pro-tag {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      font-family: var(--mono);
+      font-size: 9px;
+      color: var(--blue);
+      border: 1px solid var(--border2);
+      padding: 2px 6px;
+      letter-spacing: 0.1em;
+    }
+
+    /* ── CTA BANNER ── */
+    .cta-banner {
+      position: relative;
+      z-index: 10;
+      margin: 0 24px 64px;
+      background: linear-gradient(135deg, var(--bg3) 0%, rgba(41,121,255,0.08) 100%);
+      border: 1px solid var(--border2);
+      padding: 48px 40px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 32px;
+      flex-wrap: wrap;
+      overflow: hidden;
+    }
+
+    .cta-banner::before {
+      content: '';
+      position: absolute;
+      right: -60px;
+      top: -60px;
+      width: 240px;
+      height: 240px;
+      background: radial-gradient(circle, rgba(41,121,255,0.1), transparent 70%);
+      pointer-events: none;
+    }
+
+    .cta-left .cta-title {
+      font-family: var(--sans);
+      font-size: 28px;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 8px;
+    }
+
+    .cta-left .cta-sub {
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--text-dim);
+    }
+
+    /* ── TICKER ── */
+    .ticker-wrap {
+      position: relative;
+      z-index: 10;
+      overflow: hidden;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      background: var(--bg2);
+      height: 36px;
+      display: flex;
+      align-items: center;
+    }
+
+    .ticker-track {
+      display: flex;
+      gap: 0;
+      animation: ticker 40s linear infinite;
+      white-space: nowrap;
+    }
+
+    @keyframes ticker {
+      from { transform: translateX(0); }
+      to   { transform: translateX(-50%); }
+    }
+
+    .ticker-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 0 32px;
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--text-dim);
+      border-right: 1px solid var(--border);
+    }
+
+    .ticker-item .up   { color: var(--green); }
+    .ticker-item .down { color: var(--red); }
+
+    /* ── FOOTER ── */
+    footer {
+      position: relative;
+      z-index: 10;
+      border-top: 1px solid var(--border);
+      padding: 40px 24px 24px;
+    }
+
+    .footer-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .footer-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 32px;
+      flex-wrap: wrap;
+      margin-bottom: 32px;
+    }
+
+    .footer-brand .brand-name {
+      font-family: var(--mono);
+      font-size: 14px;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+
+    .footer-brand .brand-desc {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--text-dim);
+      line-height: 1.8;
+      max-width: 240px;
+    }
+
+    .footer-links h4 {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.2em;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      margin-bottom: 14px;
+    }
+
+    .footer-links ul { list-style: none; }
+
+    .footer-links li { margin-bottom: 8px; }
+
+    .footer-links a {
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--text-dim);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .footer-links a:hover { color: var(--text); }
+
+    .footer-bottom {
+      border-top: 1px solid var(--border);
+      padding-top: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .footer-bottom span {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--text-dim);
+    }
+  </style>
 </head>
 <body>
+<div class="page-grid"></div>
 
-<div class="topbar">
-<h1>Polymarket Alpha Terminal PRO</h1>
-<a href="dashboard.html">Open Dashboard</a>
+<!-- NAV -->
+<nav class="nav">
+  <a href="index.html" class="nav-logo">
+    <span class="dot">◈</span> ALPHA_TERMINAL
+  </a>
+  <div class="nav-links">
+    <a href="index.html" class="nav-link active">Home</a>
+    <a href="dashboard.html" class="nav-link">Dashboard</a>
+    <a href="pricing.html" class="nav-link">Pricing</a>
+    <button class="nav-btn" id="identity-btn">Login</button>
+    <a href="pricing.html" class="nav-btn primary" style="text-decoration:none;margin-left:4px;">Upgrade</a>
+  </div>
+</nav>
+
+<!-- TICKER -->
+<div class="ticker-wrap">
+  <div class="ticker-track" id="ticker">
+    <span class="ticker-item">POLITICS <span class="up">↑ +12 markets</span></span>
+    <span class="ticker-item">CRYPTO/BTC <span class="up">↑ 67.2%</span></span>
+    <span class="ticker-item">US ELECTION 2026 <span class="up">↑ HOT</span></span>
+    <span class="ticker-item">ETH/USD <span class="down">↓ 43.1%</span></span>
+    <span class="ticker-item">AI PREDICTIONS <span class="up">↑ 8 new</span></span>
+    <span class="ticker-item">SPORTS: NBA FINALS <span class="up">↑ 71%</span></span>
+    <span class="ticker-item">WORLD EVENTS <span class="up">↑ 34 active</span></span>
+    <span class="ticker-item">SCIENCE <span class="up">↑ 22.8%</span></span>
+    <!-- duplicate for loop -->
+    <span class="ticker-item">POLITICS <span class="up">↑ +12 markets</span></span>
+    <span class="ticker-item">CRYPTO/BTC <span class="up">↑ 67.2%</span></span>
+    <span class="ticker-item">US ELECTION 2026 <span class="up">↑ HOT</span></span>
+    <span class="ticker-item">ETH/USD <span class="down">↓ 43.1%</span></span>
+    <span class="ticker-item">AI PREDICTIONS <span class="up">↑ 8 new</span></span>
+    <span class="ticker-item">SPORTS: NBA FINALS <span class="up">↑ 71%</span></span>
+    <span class="ticker-item">WORLD EVENTS <span class="up">↑ 34 active</span></span>
+    <span class="ticker-item">SCIENCE <span class="up">↑ 22.8%</span></span>
+  </div>
 </div>
 
-<section class="hero">
-<h2>Find prediction market opportunities before the crowd</h2>
-<p>AI signals, whale activity, and probability edge detection.</p>
-</section>
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-glow"></div>
+  <div class="hero-eyebrow">
+    <span class="live-dot"></span> LIVE ALPHA SIGNALS ACTIVE
+  </div>
+  <h1 class="hero-title">
+    Find Prediction Market<br/>
+    <span class="accent">Edges</span> Before<br/>
+    <span class="accent2">The Crowd Does</span>
+  </h1>
+  <p class="hero-sub">
+    AI probability models, whale activity tracking,<br/>
+    and real-time edge detection across all Polymarket categories.<span class="cursor"></span>
+  </p>
+  <div class="hero-cta">
+    <a href="dashboard.html" class="btn-primary">▸ &nbsp;Open Dashboard</a>
+    <a href="pricing.html" class="btn-secondary">View Pricing →</a>
+  </div>
+</div>
 
+<!-- STATS BAR -->
+<div class="stats-bar">
+  <div class="stat-item">
+    <span class="stat-num" id="s-markets">—</span>
+    <span class="stat-label">Active Markets</span>
+  </div>
+  <div class="stat-item">
+    <span class="stat-num"><span>8</span> cats</span>
+    <span class="stat-label">Categories</span>
+  </div>
+  <div class="stat-item">
+    <span class="stat-num" id="s-signals">—</span>
+    <span class="stat-label">AI Signals Today</span>
+  </div>
+  <div class="stat-item">
+    <span class="stat-num"><span>$</span>29</span>
+    <span class="stat-label">Pro / Month</span>
+  </div>
+</div>
+
+<!-- CATEGORIES -->
+<div class="section" style="animation: fadeUp 0.5s ease 0.1s both;">
+  <div class="section-header">
+    <span class="section-label">// 01</span>
+    <h2 class="section-title">Browse by Category</h2>
+    <div class="section-line"></div>
+  </div>
+
+  <div class="cat-grid">
+    <a href="dashboard.html?cat=politics" class="cat-card" style="--cat-color:#ff6b35">
+      <span class="cat-icon">🗳️</span>
+      <div class="cat-name">Politics</div>
+      <div class="cat-count">48 active markets</div>
+      <span class="cat-badge">HOT</span>
+    </a>
+    <a href="dashboard.html?cat=crypto" class="cat-card" style="--cat-color:#f7931a">
+      <span class="cat-icon">₿</span>
+      <div class="cat-name">Crypto</div>
+      <div class="cat-count">62 active markets</div>
+      <span class="cat-badge">LIVE</span>
+    </a>
+    <a href="dashboard.html?cat=sports" class="cat-card" style="--cat-color:#00e676">
+      <span class="cat-icon">🏆</span>
+      <div class="cat-name">Sports</div>
+      <div class="cat-count">37 active markets</div>
+    </a>
+    <a href="dashboard.html?cat=world" class="cat-card" style="--cat-color:#2979ff">
+      <span class="cat-icon">🌍</span>
+      <div class="cat-name">World Events</div>
+      <div class="cat-count">29 active markets</div>
+    </a>
+    <a href="dashboard.html?cat=science" class="cat-card" style="--cat-color:#aa00ff">
+      <span class="cat-icon">🔬</span>
+      <div class="cat-name">Science & Tech</div>
+      <div class="cat-count">19 active markets</div>
+    </a>
+    <a href="dashboard.html?cat=finance" class="cat-card" style="--cat-color:#ffd740">
+      <span class="cat-icon">📈</span>
+      <div class="cat-name">Finance</div>
+      <div class="cat-count">24 active markets</div>
+    </a>
+    <a href="dashboard.html?cat=entertainment" class="cat-card" style="--cat-color:#ff4081">
+      <span class="cat-icon">🎬</span>
+      <div class="cat-name">Entertainment</div>
+      <div class="cat-count">15 active markets</div>
+    </a>
+    <a href="dashboard.html?cat=ai" class="cat-card" style="--cat-color:#00e5ff">
+      <span class="cat-icon">🤖</span>
+      <div class="cat-name">AI & Startups</div>
+      <div class="cat-count">21 active markets</div>
+      <span class="cat-badge">NEW</span>
+    </a>
+  </div>
+</div>
+
+<!-- LIVE MARKETS PREVIEW -->
+<div class="section" style="padding-top:0; animation: fadeUp 0.5s ease 0.15s both;">
+  <div class="section-header">
+    <span class="section-label">// 02</span>
+    <h2 class="section-title">Top Alpha Signals</h2>
+    <div class="section-line"></div>
+    <div class="live-badge"><span class="live-dot" style="width:5px;height:5px;background:var(--green);border-radius:50%;animation:pulse 2s infinite"></span> LIVE</div>
+  </div>
+
+  <div class="markets-preview">
+    <div class="markets-header">
+      <div class="markets-header-left">MARKET SCANNER // TOP EDGES</div>
+      <div class="live-badge"><span style="width:5px;height:5px;background:var(--green);border-radius:50%;display:inline-block;animation:pulse 2s infinite"></span>&nbsp;UPDATING</div>
+    </div>
+    <div class="market-row market-row-header">
+      <span>Market</span><span style="text-align:right">Market%</span><span style="text-align:right">AI%</span><span style="text-align:right">Edge</span>
+    </div>
+
+    <!-- Sample rows - first 5 free, rest blurred -->
+    <div class="market-row">
+      <div><div class="market-name">Will BTC hit $100k in Q2 2026?</div><div class="market-cat">CRYPTO</div></div>
+      <div class="market-prob">44%</div>
+      <div class="market-ai">67%</div>
+      <div class="market-edge edge-high">+23%</div>
+    </div>
+    <div class="market-row">
+      <div><div class="market-name">Will US pass crypto regulation in 2026?</div><div class="market-cat">POLITICS · CRYPTO</div></div>
+      <div class="market-prob">31%</div>
+      <div class="market-ai">49%</div>
+      <div class="market-edge edge-high">+18%</div>
+    </div>
+    <div class="market-row">
+      <div><div class="market-name">Will Lakers win the 2026 NBA Finals?</div><div class="market-cat">SPORTS</div></div>
+      <div class="market-prob">18%</div>
+      <div class="market-ai">29%</div>
+      <div class="market-edge edge-mid">+11%</div>
+    </div>
+    <div class="market-row">
+      <div><div class="market-name">Will GPT-5 launch before July 2026?</div><div class="market-cat">AI & TECH</div></div>
+      <div class="market-prob">52%</div>
+      <div class="market-ai">61%</div>
+      <div class="market-edge edge-mid">+9%</div>
+    </div>
+    <div class="market-row">
+      <div><div class="market-name" class="blurred">██████████████████████████</div><div class="market-cat">FINANCE</div></div>
+      <div class="market-prob blurred">76%</div>
+      <div class="market-ai blurred">91%</div>
+      <div class="market-edge edge-high blurred">+15%</div>
+    </div>
+    <div class="market-row">
+      <div><div class="market-name blurred">████████████████████████</div><div class="market-cat">POLITICS</div></div>
+      <div class="market-prob blurred">22%</div>
+      <div class="market-ai blurred">38%</div>
+      <div class="market-edge edge-high blurred">+16%</div>
+    </div>
+
+    <div class="unlock-row">
+      <div class="unlock-text">🔒 <strong>+142 more markets</strong> with AI signals hidden — upgrade to see all edges</div>
+      <a href="pricing.html" class="btn-primary" style="padding:10px 20px;font-size:11px;">Unlock Pro →</a>
+    </div>
+  </div>
+</div>
+
+<!-- HOW IT WORKS -->
+<div class="section" style="animation: fadeUp 0.5s ease 0.2s both;">
+  <div class="section-header">
+    <span class="section-label">// 03</span>
+    <h2 class="section-title">How It Works</h2>
+    <div class="section-line"></div>
+  </div>
+
+  <div class="how-grid">
+    <div class="how-card">
+      <div class="how-num">01</div>
+      <div class="how-title">AI Scans Markets</div>
+      <div class="how-desc">Our model evaluates every active Polymarket event and generates an independent probability estimate using news, sentiment, and historical data.</div>
+    </div>
+    <div class="how-card">
+      <div class="how-num">02</div>
+      <div class="how-title">Edge is Calculated</div>
+      <div class="how-desc">The difference between our AI probability and the current market price = your edge. A large gap signals a potential mispricing.</div>
+    </div>
+    <div class="how-card">
+      <div class="how-num">03</div>
+      <div class="how-title">You See It First</div>
+      <div class="how-desc">Markets are ranked by edge score. Act on high-edge signals before the crowd corrects the price.</div>
+    </div>
+    <div class="how-card">
+      <div class="how-num">04</div>
+      <div class="how-title">Track & Alert</div>
+      <div class="how-desc">Set alerts on specific markets. Get notified when probability moves in your favor or a new high-edge opportunity appears.</div>
+    </div>
+  </div>
+</div>
+
+<!-- FEATURES -->
+<div class="section" style="animation: fadeUp 0.5s ease 0.25s both;">
+  <div class="section-header">
+    <span class="section-label">// 04</span>
+    <h2 class="section-title">Pro Features</h2>
+    <div class="section-line"></div>
+  </div>
+
+  <div class="features-grid">
+    <div class="feat-card">
+      <div class="feat-icon">🧠</div>
+      <div class="feat-title">AI Probability Engine</div>
+      <div class="feat-desc">Independent probability estimates for every market, updated in real time. Compare against market consensus to find edges.</div>
+      <span class="feat-pro-tag">PRO</span>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon">🐋</div>
+      <div class="feat-title">Whale Activity Tracker</div>
+      <div class="feat-desc">Monitor large position movements on Polymarket. When whales move, the edge often follows. Be the first to know.</div>
+      <span class="feat-pro-tag">PRO</span>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon">📊</div>
+      <div class="feat-title">Edge Score Ranking</div>
+      <div class="feat-desc">Every market scored and ranked by edge magnitude. Filter by category, edge size, or market volume to find your ideal opportunities.</div>
+      <span class="feat-pro-tag">PRO</span>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon">🔔</div>
+      <div class="feat-title">Real-Time Alerts</div>
+      <div class="feat-desc">Set price and probability triggers on any market. Get instant alerts when conditions are met — never miss a move.</div>
+      <span class="feat-pro-tag">PRO</span>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon">📉</div>
+      <div class="feat-title">Probability Charts</div>
+      <div class="feat-desc">Full historical probability chart for every market. See how AI predictions and market prices have diverged and converged over time.</div>
+      <span class="feat-pro-tag">PRO</span>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon">🗂️</div>
+      <div class="feat-title">Category Deep Dive</div>
+      <div class="feat-desc">Filter and analyze markets by category. See top edges in crypto, politics, sports, and more — all in one view.</div>
+      <span class="feat-pro-tag">PRO</span>
+    </div>
+  </div>
+</div>
+
+<!-- CTA BANNER -->
+<div class="cta-banner">
+  <div class="cta-left">
+    <div class="cta-title">Ready to trade with edge?</div>
+    <div class="cta-sub">Join Pro — cancel anytime. $29/month.</div>
+  </div>
+  <a href="pricing.html" class="btn-primary">▸ &nbsp;Get Pro Access</a>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <div class="brand-name">◈ ALPHA_TERMINAL</div>
+        <div class="brand-desc">AI-powered edge detection for Polymarket prediction traders.</div>
+      </div>
+      <div class="footer-links">
+        <h4>Product</h4>
+        <ul>
+          <li><a href="dashboard.html">Dashboard</a></li>
+          <li><a href="pricing.html">Pricing</a></li>
+          <li><a href="#">Changelog</a></li>
+        </ul>
+      </div>
+      <div class="footer-links">
+        <h4>Account</h4>
+        <ul>
+          <li><a href="#" onclick="netlifyIdentity.open('login')">Login</a></li>
+          <li><a href="#" onclick="netlifyIdentity.open('signup')">Sign Up</a></li>
+          <li><a href="#">Settings</a></li>
+        </ul>
+      </div>
+      <div class="footer-links">
+        <h4>Legal</h4>
+        <ul>
+          <li><a href="#">Terms of Service</a></li>
+          <li><a href="#">Privacy Policy</a></li>
+          <li><a href="#">Disclaimer</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Polymarket Alpha Terminal. Not financial advice.</span>
+      <span>Built on Polymarket API · Powered by AI</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // Netlify Identity
+  netlifyIdentity.on('init', user => {
+    if (user) document.getElementById('identity-btn').textContent = 'Account';
+  });
+  netlifyIdentity.on('login', user => {
+    netlifyIdentity.close();
+    const roles = user?.app_metadata?.roles || [];
+    window.location.href = roles.includes('pro') ? '/dashboard.html' : '/pricing.html';
+  });
+  netlifyIdentity.on('logout', () => {
+    document.getElementById('identity-btn').textContent = 'Login';
+  });
+  document.getElementById('identity-btn').addEventListener('click', () => netlifyIdentity.open());
+
+  // Animated stats (simulate live)
+  function animateCount(id, target, prefix = '', suffix = '') {
+    let start = 0;
+    const el = document.getElementById(id);
+    if (!el) return;
+    const step = () => {
+      start += Math.ceil((target - start) / 8);
+      el.innerHTML = `<span>${prefix}</span>${start}${suffix}`;
+      if (start < target) requestAnimationFrame(step);
+      else el.innerHTML = `<span>${prefix}</span>${target}${suffix}`;
+    };
+    step();
+  }
+  setTimeout(() => {
+    animateCount('s-markets', 255);
+    animateCount('s-signals', 47);
+  }, 400);
+</script>
 </body>
 </html>
