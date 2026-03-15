@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Welcome to Pro — Polymarket Alpha Terminal</title>
+  <link rel="stylesheet" href="style.css"/>
+  <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+  <style>
+    .success-wrap {
+      position: relative;
+      z-index: 10;
+      min-height: calc(100vh - 56px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 24px;
+    }
+
+    .success-box {
+      max-width: 480px;
+      width: 100%;
+      background: var(--bg2);
+      border: 1px solid var(--border2);
+      padding: 48px 40px;
+      text-align: center;
+      box-shadow: 0 0 80px rgba(41,121,255,0.08);
+      animation: fadeUp 0.5s ease both;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .success-box::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--blue), var(--green));
+    }
+
+    .check-circle {
+      width: 64px;
+      height: 64px;
+      background: rgba(0,230,118,0.1);
+      border: 2px solid var(--green);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      margin: 0 auto 24px;
+      animation: popIn 0.4s ease 0.2s both;
+    }
+
+    @keyframes popIn {
+      from { transform: scale(0.5); opacity: 0; }
+      to   { transform: scale(1);   opacity: 1; }
+    }
+
+    .success-label {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.25em;
+      color: var(--green);
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+
+    .success-title {
+      font-family: var(--sans);
+      font-size: 28px;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 12px;
+      letter-spacing: 0.03em;
+    }
+
+    .success-desc {
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--text-dim);
+      line-height: 1.9;
+      margin-bottom: 32px;
+    }
+
+    .perks-list {
+      list-style: none;
+      margin-bottom: 32px;
+      text-align: left;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .perks-list li {
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .perks-list li .icon { color: var(--green); }
+
+    .go-btn {
+      display: block;
+      width: 100%;
+      padding: 14px;
+      background: var(--blue);
+      border: 1px solid var(--blue);
+      color: #fff;
+      font-family: var(--mono);
+      font-size: 12px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+
+    .go-btn:hover {
+      background: var(--blue2);
+      box-shadow: 0 0 24px rgba(41,121,255,0.4);
+    }
+  </style>
+</head>
+<body>
+<div class="page-grid"></div>
+
+<nav class="nav">
+  <a href="index.html" class="nav-logo">
+    <span class="dot">◈</span> ALPHA_TERMINAL
+  </a>
+</nav>
+
+<div class="success-wrap">
+  <div class="success-box">
+    <div class="check-circle">✓</div>
+    <div class="success-label">// PAYMENT CONFIRMED</div>
+    <h1 class="success-title">Welcome to Pro</h1>
+    <p class="success-desc">
+      Your subscription is active. You now have full access to all AI signals, whale tracking, edge scoring, and real-time alerts.
+    </p>
+
+    <ul class="perks-list">
+      <li><span class="icon">✓</span> AI probability signals — unlocked</li>
+      <li><span class="icon">✓</span> Whale activity tracker — unlocked</li>
+      <li><span class="icon">✓</span> Full edge score ranking — unlocked</li>
+      <li><span class="icon">✓</span> Real-time alerts — unlocked</li>
+      <li><span class="icon">✓</span> Probability charts — unlocked</li>
+    </ul>
+
+    <a href="dashboard.html" class="go-btn" id="go-btn">▸ &nbsp;Open Dashboard</a>
+  </div>
+</div>
+
+<script>
+  // Refresh user session to pick up new Pro role
+  netlifyIdentity.on('init', user => {
+    if (user) {
+      netlifyIdentity.refresh().then(() => {
+        console.log('Session refreshed after payment');
+      });
+    }
+  });
+</script>
+</body>
+</html>
