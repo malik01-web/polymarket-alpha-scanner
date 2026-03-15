@@ -1048,16 +1048,15 @@ function renderChart() {
 }
 
 // ─── AUTH ────────────────────────────────────────────────
-netlifyIdentity.on('init', user => {
-  if (user) {
-    document.getElementById('identity-btn').textContent = 'Account';
-    const roles = user.app_metadata?.roles || [];
-    if (roles.includes('pro')) {
-      document.getElementById('plan-chip').textContent = 'PRO';
-      document.getElementById('plan-chip').className = 'plan-chip pro';
-      document.getElementById('upgrade-banner').style.display = 'none';
-    }
+netlifyIdentity.on('login', user => {
+  netlifyIdentity.close();
+  const roles = user?.app_metadata?.roles || [];
+  if (roles.includes('pro')) {
+    document.getElementById('plan-chip').textContent = 'PRO';
+    document.getElementById('plan-chip').className = 'plan-chip pro';
+    document.getElementById('upgrade-banner').style.display = 'none';
   }
+  document.getElementById('identity-btn').textContent = 'Account';
 });
 
 netlifyIdentity.on('login', user => {
