@@ -1,19 +1,34 @@
-
 <!DOCTYPE html>
 <html>
+
 <head>
-<meta charset="UTF-8">
-<title>Polymarket Alpha Scanner</title>
+<title>Polymarket Terminal</title>
 <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-<h1>Polymarket Alpha Scanner</h1>
+<div class="sidebar">
 
-<div id="alerts"></div>
+<h2>Alpha Terminal</h2>
 
-<table id="markets">
+<ul>
+<li onclick="loadMarkets()">Markets</li>
+<li onclick="loadSignals()">Alpha Signals</li>
+<li onclick="loadWhales()">Whale Tracker</li>
+<li onclick="loadMispricing()">Mispricing</li>
+</ul>
+
+</div>
+
+<div class="main">
+
+<h1>Live Market Scanner</h1>
+
+<input id="search" placeholder="Search markets">
+
+<table>
+
 <thead>
 <tr>
 <th>Market</th>
@@ -22,11 +37,15 @@
 <th>Signal</th>
 </tr>
 </thead>
-<tbody></tbody>
+
+<tbody id="markets"></tbody>
+
 </table>
 
+</div>
+
 <script src="dashboard.js"></script>
-<script src="alerts.js"></script>
 
 </body>
+
 </html>
